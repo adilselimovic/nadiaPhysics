@@ -68,3 +68,4 @@ def animate_planet(position, velocity, m_star, dt):
         rate(fps)
         planet.pos, velocity = move_planet(planet.pos, velocity, m_star, dt)
         time = time + dt
+#change
