@@ -1,0 +1,70 @@
+from vpython import vector, mag, sphere, rate, color, canvas
+G = 1.      # gravitational constant [using units where gravitational constant is 1.0]
+
+#Calculating the gravitational force between two objects
+def force(pos1, pos2, m1, m2):
+    """
+    Returns the gravitational force exerted by object 2 on object 1.
+    Input:
+      - pos1 = position vector of first object
+      - pos2 = position vector of second object
+      - m1   = mass of first object
+      - m2   = mass of second object
+    Depends on:
+      - G    = gravitational constant (global variable)
+    """
+    r = pos1 - pos2
+    unit_vector = r / mag(r)
+    force = (- G * m1 * m2 / (mag(r)**2)) * unit_vector
+    return force
+
+#Calculating the motion of a planet in the gravitational field of a star
+def move_planet(position, velocity, m_star, dt):
+    """
+    Calculate motion of planet in the gravitational field of a star with given mass
+    at the origin, using Euler's method.
+    
+    Input:
+      - position: position vector of planet at start of time step
+      - velocity: velocity vector of planet at start of time step
+      - m_star:   mass of star
+      - dt:       time step
+      
+    Output: (position_new, velocity_new)
+      - position_new: position vector of planet at end of time step
+      - velocity_new: velocity vector of planet at end of time step
+      
+    Depends on:
+      - force = function to calculate the gravitational force between two objects
+    """
+    #call force to get acceleration, making star start at origin
+    a = force(position, vector(0,0,0), 1, m_star)
+    #use elulers method for new velocity and position, r' = r + vt, v' = v + at
+    velocity_new = velocity + (a * dt)
+    position_new = position + (velocity * dt)
+    return(position_new, velocity_new)
+
+#Animating the orbit of a planet
+def animate_planet(position, velocity, m_star, dt):
+    """
+    Animate planetary orbit from given starting position, with given time step.
+    
+    Input:
+      - position: position vector of planet at start of simulation
+      - velocity: velocity vector of planet at start of simulation
+      - m_star:   mass of star
+      - dt:       time step
+    """
+    #Set up initial values and position of planet
+    time = 0
+    planet = sphere(pos=position,radius=0.2,make_trail=True,color=color.red)
+    
+    #set up max time and frames per second for animation
+    maxtime = 10
+    fps = 1/dt
+    
+    #loop to animate orbit
+    while time < maxtime:
+        rate(fps)
+        planet.pos, velocity = move_planet(planet.pos, velocity, m_star, dt)
+        time = time + dt
